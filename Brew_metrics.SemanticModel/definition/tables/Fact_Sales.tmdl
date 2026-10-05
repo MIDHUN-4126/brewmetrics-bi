@@ -25,6 +25,18 @@ table Fact_Sales
 		)
 		
 
+	measure 'City Sales Rank' =
+		RANKX (
+			ALLSELECTED ( Dim_City[city] ),
+			CALCULATE (
+				[Total Sales],
+				REMOVEFILTERS ( Fact_Sales[city] )
+			),
+			,
+			DESC,
+			DENSE
+		)
+
 	column sale_id
 		dataType: int64
 		formatString: 0
