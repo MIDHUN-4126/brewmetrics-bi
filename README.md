@@ -83,6 +83,6 @@ dashboard, and documentation.
 
 ## AI-Assisted Development
 
-GitHub Copilot was used to assist with DAX development.
+Codex was used to assist with DAX development.
 The NOTES.md file documents the suggestions received
 and the validation/corrections made.
