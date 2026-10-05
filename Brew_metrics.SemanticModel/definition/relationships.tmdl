@@ -16,6 +16,6 @@ relationship AutoDetected_5537ede3-b282-4da7-a176-61f129fd57af
 	toColumn: Dim_Product.item
 
 relationship a56e6de6-4399-2dcf-3085-a7212598a3eb
-	fromColumn: Fact_Sales.city
+	fromColumn: Fact_Sales.date
 	toColumn: Dim_Date.Date
 
