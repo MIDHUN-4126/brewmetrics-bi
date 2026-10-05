@@ -3,7 +3,7 @@ table Fact_Sales
 
 	measure 'Total Sales' =
 		SUM ( Fact_Sales[sales_amount] )
-		formatString: #,0.00
+		
 
 	measure 'MoM Sales Growth %' =
 		VAR PreviousMonthSales =
@@ -13,7 +13,17 @@ table Fact_Sales
 			)
 		RETURN
 			DIVIDE ( [Total Sales] - PreviousMonthSales, PreviousMonthSales )
-		formatString: 0.00%;-0.00%;0.00%
+		
+
+	measure 'Running Total Sales' =
+		CALCULATE (
+			[Total Sales],
+			FILTER (
+				ALLSELECTED ( Dim_Date[Date] ),
+				Dim_Date[Date] <= MAX ( Dim_Date[Date] )
+			)
+		)
+		
 
 	column sale_id
 		dataType: int64
