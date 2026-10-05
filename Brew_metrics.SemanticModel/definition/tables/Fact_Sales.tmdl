@@ -2,7 +2,10 @@ table Fact_Sales
 	lineageTag: c1045a1e-1279-4447-bd66-db26e6f1da3b
 
 	measure 'Total Sales' = SUM ( Fact_Sales[sales_amount] )
+		formatString: "₹"#,0.00;-"₹"#,0.00;"₹"#,0.00
 		lineageTag: 0f20eb95-52b6-4844-bdd5-a473d8e83a22
+
+		annotation PBI_FormatHint = {"currencyCulture":"bho-Deva-IN"}
 
 	measure 'MoM Sales Growth %' =
 			VAR PreviousMonthSales =
