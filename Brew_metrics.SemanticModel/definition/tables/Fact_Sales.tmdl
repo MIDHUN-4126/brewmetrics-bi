@@ -1,41 +1,54 @@
 table Fact_Sales
 	lineageTag: c1045a1e-1279-4447-bd66-db26e6f1da3b
 
-	measure 'Total Sales' =
-		SUM ( Fact_Sales[sales_amount] )
-		
+	measure 'Total Sales' = SUM ( Fact_Sales[sales_amount] )
+		lineageTag: 0f20eb95-52b6-4844-bdd5-a473d8e83a22
 
 	measure 'MoM Sales Growth %' =
-		VAR PreviousMonthSales =
-			CALCULATE (
-				[Total Sales],
-				DATEADD ( Dim_Date[Date], -1, MONTH )
-			)
-		RETURN
-			DIVIDE ( [Total Sales] - PreviousMonthSales, PreviousMonthSales )
-		
+			VAR PreviousMonthSales =
+				CALCULATE (
+					[Total Sales],
+					DATEADD ( Dim_Date[Date], -1, MONTH )
+				)
+			RETURN
+				DIVIDE ( [Total Sales] - PreviousMonthSales, PreviousMonthSales )
+		lineageTag: de1743af-72af-4b56-ab1f-b0b004ce766b
 
 	measure 'Running Total Sales' =
-		CALCULATE (
-			[Total Sales],
-			FILTER (
-				ALLSELECTED ( Dim_Date[Date] ),
-				Dim_Date[Date] <= MAX ( Dim_Date[Date] )
-			)
-		)
-		
-
-	measure 'City Sales Rank' =
-		RANKX (
-			ALLSELECTED ( Dim_City[city] ),
 			CALCULATE (
 				[Total Sales],
-				REMOVEFILTERS ( Fact_Sales[city] )
-			),
-			,
-			DESC,
-			DENSE
-		)
+				FILTER (
+					ALLSELECTED ( Dim_Date[Date] ),
+					Dim_Date[Date] <= MAX ( Dim_Date[Date] )
+				)
+			)
+		lineageTag: ed662cbd-7346-4674-9f89-100e5322095a
+
+	measure 'City Sales Rank' =
+			RANKX (
+				ALLSELECTED ( Dim_City[city] ),
+				CALCULATE (
+					[Total Sales],
+					REMOVEFILTERS ( Fact_Sales[city] )
+				),
+				,
+				DESC,
+				DENSE
+			)
+		lineageTag: 8b1ba589-87cb-4fd4-809f-e851ab2d90fe
+
+	measure 'Average Sales per Transaction' =
+			DIVIDE (
+				[Total Sales],
+				DISTINCTCOUNT ( Fact_Sales[sale_id] )
+			)
+		lineageTag: 45937e01-293e-45f1-a186-9aef0924f040
+
+	measure 'Total Transactions' =
+			
+			DISTINCTCOUNT(Fact_Sales[sale_id])
+		formatString: 0
+		lineageTag: 6201cb9f-d7e3-4fcd-a84c-085bdf4b1920
 
 	column sale_id
 		dataType: int64

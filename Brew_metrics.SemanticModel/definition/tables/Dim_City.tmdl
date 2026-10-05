@@ -1,6 +1,12 @@
 table Dim_City
 	lineageTag: 8792be5a-58fc-4b1f-84cf-5a929e48a888
 
+	measure 'Total Quantity' =
+			
+			SUM(Fact_Sales[quantity])
+		formatString: 0
+		lineageTag: 9fe966a7-c85f-4bc6-84be-e94349e33351
+
 	column city
 		dataType: string
 		lineageTag: fbf0794f-3315-4467-b2c9-de738a88983b

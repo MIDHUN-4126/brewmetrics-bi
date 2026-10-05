@@ -61,3 +61,20 @@ sales order.
 ### Validation
 I checked the result against a table visual and confirmed that the city
 with the highest sales received rank 1.
+
+## Measure 4 -Average sales per transaction
+
+```DAX
+Average Sales per Transaction =
+DIVIDE (
+    [Total Sales],
+    DISTINCTCOUNT ( Fact_Sales[sale_id] )
+)
+```
+### Purpose
+Calculates the average sales amount per unique transaction.
+
+### Codex assistance
+Codex suggested dividing total sales by the number of transactions.
+It used DISTINCTCOUNT on sale_id so that each transaction is counted
+once rather than counting individual product quantities.
