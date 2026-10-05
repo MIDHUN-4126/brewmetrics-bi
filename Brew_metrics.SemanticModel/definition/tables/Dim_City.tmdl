@@ -1,0 +1,36 @@
+table Dim_City
+	lineageTag: 8792be5a-58fc-4b1f-84cf-5a929e48a888
+
+	column city
+		dataType: string
+		lineageTag: fbf0794f-3315-4467-b2c9-de738a88983b
+		summarizeBy: none
+		sourceColumn: city
+
+		annotation SummarizationSetBy = Automatic
+
+	column CityKey
+		dataType: int64
+		formatString: 0
+		lineageTag: f38ad44d-1a49-4f05-a99e-cb56e646107c
+		summarizeBy: none
+		sourceColumn: CityKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_City = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\Users\Asus\OneDrive - Kumaraguru College of Technology\Desktop\sem 5\Bussines intelligence\Brew_Mini\brewmetrics-bi\brewmetrics_sales.csv"), [Delimiter = ",", Columns = 9, QuoteStyle = QuoteStyle.None]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"sale_id", Int64.Type}, {"date", type date}, {"city", type text}, {"store_format", type text}, {"category", type text}, {"item", type text}, {"quantity", Int64.Type}, {"unit_price", Int64.Type}, {"sales_amount", type number}}, "en-US"),
+				  #"Removed other columns" = Table.SelectColumns(#"Changed column type", {"city"}),
+				  #"Removed duplicates" = Table.Distinct(#"Removed other columns", {"city"}),
+				  #"Added index" = Table.AddIndexColumn(#"Removed duplicates", "Index", 0, 1, Int64.Type),
+				  #"Renamed columns" = Table.RenameColumns(#"Added index", {{"Index", "CityKey"}})
+				in
+				  #"Renamed columns"
+
+	annotation PBI_ResultType = Table
+

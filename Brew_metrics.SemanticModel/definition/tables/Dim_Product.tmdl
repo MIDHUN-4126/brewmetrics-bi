@@ -1,0 +1,47 @@
+table Dim_Product
+	lineageTag: a614910a-92b4-488f-98e8-cfd2b973b56a
+
+	column item
+		dataType: string
+		lineageTag: 1d1fb678-8568-4075-822e-4e5c52a76d5e
+		summarizeBy: none
+		sourceColumn: item
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 54578b7b-9dbe-4529-8269-38690d55d40e
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: int64
+		formatString: 0
+		lineageTag: d3b3a41c-c83f-4fc5-9e37-c422c0ed30a9
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Product = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\Users\Asus\OneDrive - Kumaraguru College of Technology\Desktop\sem 5\Bussines intelligence\Brew_Mini\brewmetrics-bi\brewmetrics_sales.csv"), [Delimiter = ",", Columns = 9, QuoteStyle = QuoteStyle.None]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"sale_id", Int64.Type}, {"date", type date}, {"city", type text}, {"store_format", type text}, {"category", type text}, {"item", type text}, {"quantity", Int64.Type}, {"unit_price", Int64.Type}, {"sales_amount", type number}}, "en-US"),
+				  #"Removed other columns" = Table.SelectColumns(#"Changed column type", {"item", "category"}),
+				  #"Added index" = Table.AddIndexColumn(#"Removed other columns", "Index", 0, 1, Int64.Type),
+				  #"Renamed columns" = Table.RenameColumns(#"Added index", {{"Index", "ProductKey"}}),
+				  #"Removed columns" = Table.RemoveColumns(#"Renamed columns", {"ProductKey"}),
+				  #"Removed duplicates" = Table.Distinct(#"Removed columns", {"item", "category"}),
+				  #"Added index 1" = Table.AddIndexColumn(#"Removed duplicates", "Index", 0, 1, Int64.Type),
+				  #"Renamed columns 1" = Table.RenameColumns(#"Added index 1", {{"Index", "ProductKey"}})
+				in
+				  #"Renamed columns 1"
+
+	annotation PBI_ResultType = Table
+

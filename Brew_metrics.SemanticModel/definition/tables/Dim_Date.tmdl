@@ -1,0 +1,100 @@
+table Dim_Date
+	lineageTag: 7d77c101-d5db-4f3b-9cce-2f38f2a437fb
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: 664bee3b-8ea0-4331-894d-cbb9530f1061
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 915c99df-3f8f-4908-b3d8-0c02fc6b79e8
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 92550009-747d-4d7c-82a3-76cd023709f1
+		summarizeBy: sum
+		sourceColumn: Month Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: a3020953-963d-470e-bcb9-48958f38601b
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		dataType: int64
+		formatString: 0
+		lineageTag: 78d76bbe-9e5a-4611-b9f1-0ebde3a1d450
+		summarizeBy: sum
+		sourceColumn: Day
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Date = m
+		mode: import
+		source =
+				let
+				    StartDate = List.Min(Fact_Sales[date]),
+				    EndDate = List.Max(Fact_Sales[date]),
+				    DateList = List.Dates(
+				        StartDate,
+				        Duration.Days(EndDate - StartDate) + 1,
+				        #duration(1,0,0,0)
+				    ),
+				    DateTable = Table.FromList(
+				        DateList,
+				        Splitter.SplitByNothing(),
+				        {"Date"}
+				    ),
+				    ChangedType = Table.TransformColumnTypes(
+				        DateTable,
+				        {{"Date", type date}}
+				    ),
+				    AddYear = Table.AddColumn(
+				        ChangedType,
+				        "Year",
+				        each Date.Year([Date]),
+				        Int64.Type
+				    ),
+				    AddMonthNumber = Table.AddColumn(
+				        AddYear,
+				        "Month Number",
+				        each Date.Month([Date]),
+				        Int64.Type
+				    ),
+				    AddMonth = Table.AddColumn(
+				        AddMonthNumber,
+				        "Month",
+				        each Date.MonthName([Date]),
+				        type text
+				    ),
+				    AddDay = Table.AddColumn(
+				        AddMonth,
+				        "Day",
+				        each Date.Day([Date]),
+				        Int64.Type
+				    )
+				in
+				    AddDay
+
+	annotation PBI_ResultType = Table
+
